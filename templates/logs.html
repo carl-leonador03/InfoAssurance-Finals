@@ -1,0 +1,114 @@
+{% extends 'index.html' %}
+{% block offcanvasNavbarBody %}
+<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+    <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/profile">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/preferences">Preferences</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">Audit logs</a>
+    </li>
+</ul>
+{% endblock %}
+{% block content %}
+<div class="mt-5 pt-5">    </div>
+{% for log in logs %}
+{% if log['event_type'] == 'Logged in' %}
+<div class="card border-primary mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-primary"><i class="bi bi-box-arrow-in-left"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-primary">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif log['event_type'] == 'Logged out' %}
+<div class="card border-secondary mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-secondary"><i class="bi bi-box-arrow-right"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-secondary">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif log['event_type'] == 'Created account' %}
+<div class="card border-success mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-success"><i class="bi bi-check2-square"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-success">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif 'Updated' in log['event_type'] %}
+<div class="card border-info mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-info"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-info">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif 'Changed' in log['event_type'] %}
+<div class="card border-warning mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-warning"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-warning">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif 'Edited' in log['event_type'] %}
+<div class="card border-warning mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-warning"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-warning">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% elif log['event_type'] == 'Deleted account' %}
+<div class="card border-danger mb-3 m-3">
+    <div class="card-header d-flex align-items-center">
+        <h5 class="text-danger"><i class="bi bi-trash3"></i> {{ log['event_type'] }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
+        <p class="card-text">{{ log['description'] }}</p>
+    </div>
+    <div class="card-footer bg-transparent border-danger">
+        <b>Timestamp: </b>{{ log['timestamp'] }}
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

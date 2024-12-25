@@ -1,0 +1,206 @@
+{% extends 'preferences.html' %}
+{% block offcanvasNavbarBody %}
+<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+    <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/profile">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="/preferences">Preferences</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/logs">Audit logs</a>
+    </li>
+</ul>
+{% endblock %}
+{% block preferencesTitle %}Editing user '{{ edit_user['username'] }}'{% endblock %}
+{% block userdetailsForm %}
+<form action="/edit/{{ edit_user['id'] }}?modify=details" method="POST" autocomplete="off" aria-autocomplete="none">
+    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+    <p class="card-text">Edit your profile details</p>
+    <label for="displayname" class="form-label">Display Name</label>
+    <div class="input-group">
+        <input type="text" name="displayname" class="form-control" id="basic-text" placeholder="{{ edit_user['name'] }}" aria-placeholder="{{ edit_user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your profile display name
+    </div>
+    <label for="username" class="form-label">Username</label>
+    <div class="input-group">
+        <input type="text" name="username" class="form-control" id="basic-text" placeholder="{{ edit_user['username'] }}" aria-placeholder="{{ edit_user['username'] }}" aria-label="Edit Username" aria-describedby="basic-addon4">
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your username
+    </div>
+    <label for="address" class="form-label">Address</label>
+    <div class="input-group">
+        <input type="text" name="address" class="form-control" id="basic-text" placeholder="{{ edit_user['address'] }}" aria-placeholder="{{ edit_user['address'] }}" aria-label="Edit Address" aria-describedby="basic-addon4">
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your address
+    </div>
+    <label for="contact" class="form-label">Contact</label>
+    <div class="input-group">
+        <input type="tel" name="contact" class="form-control" id="basic-text" placeholder="{{ edit_user['contact'] }}" aria-placeholder="{{ edit_user['contact'] }}" aria-label="Edit Contact" aria-describedby="basic-addon4">
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your contact number
+    </div>
+    <label for="bio" class="form-label">Bio</label>
+    <div class="input-group">
+        <textarea class="form-control" name="bio" placeholder="{{ edit_user['bio'] }}" aria-placeholder="{{ edit_user['bio'] }}" aria-label="Edit Bio" aria-describedby="basic-addon4"></textarea>
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your bio
+    </div>
+    <label for="theme" class="form-label">Theme</label>
+    <div class="input-group">
+        <select class="form-select" id="theme" name="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit your preferred site theme
+    </div>
+    <label for="theme" class="form-label">Role</label>
+    <div class="input-group">
+        <select class="form-select" id="role" name="role" disabled>
+            <option value="1">ADMIN</option>
+            <option value="2">USER</option>
+        </select>
+    </div>
+    <div class="form-text mb-3" id="basic-addon4">
+        Edit user's role
+    </div>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+</form>
+{% endblock %}
+{% block pfpForm %}
+{% if not edit_user['pfp'][1] %}
+<img src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
+{% else %}
+<img src="data:image/{{ edit_user['pfp'][0] }};base64,{{ edit_user['pfp'][1] }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
+{% endif %}
+<form action="/edit/{{ edit_user['id'] }}?modify=pfp" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+    <div class="input-group mb-3 mt-3">
+        <input type="file" name="pfp" id="newPfp" class="form-control mb-3" required aria-required="true">
+    </div>
+    <div class="form-text mt-1 mb-2" id="basic-addon3">
+        Your new selected profile picture:
+    </div>
+    <img id="previewPfp" src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;" alt="your new pfp">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-primary" type="submit">Update</button>
+    </div>
+</form>
+{% endblock %}
+{% block passwordForm %}
+<form action="/edit/{{ edit_user['id'] }}?modify=password" method="POST">
+    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+    <div class="input-group mb-1 mt-3">
+        <span class="input-group-text" id="inputGroup-sizing-sm">New password</span>
+        <input type="password" name="newPassword" id="newPassword" class="form-control" onblur="checkVerify();" required>
+    </div>
+    <div class="form-text text-danger basic-addon4" id="invalidNewPassword">
+        Password must include at least one uppercase letter, one lowercase letter, and one special character (-+_!@#$%^&=*.,?).
+    </div>
+    <div class="input-group mb-1 mt-3">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Verify new password</span>
+        <input type="password" id="verifyPassword" class="form-control" onblur="checkVerify();" required>
+    </div>
+    <div class="form-text text-danger basic-addon4" id="invalidVerifyPassword">
+        Passwords don't match.
+    </div>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+        <button class="btn btn-primary" type="submit">Update password</button>
+    </div>
+</form>
+{% endblock %}
+{% block moreForms %}
+{% if user['id'] != edit_user['id'] %}
+<div class="card border-danger m-5" id="deleteCard">
+    <h5 class="card-header text-danger">Delete Account</h5>
+    <div class="card-body text-danger">
+        <p class="card-text">Delete this account</p>
+        <p class="card-text"><b>WARNING!</b> This action is irreversible. Once the account is deleted, it can no longer be recovered.</p>
+        <form action="javascript:void(0);" id="deleteForm" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <button class="btn btn-outline-danger" type="submit">Delete Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    newPfp.onchange = evt => {
+        const [file] = newPfp.files
+        if (file) {
+            previewPfp.src = URL.createObjectURL(file)
+        }
+    }
+    theme.value = "{{ user['theme'] }}";
+    setTheme("{{ user['theme'] }}");
+    document.onload = (() => {document.getElementsByName('username')[0].value = ""})();
+</script>
+<script type="text/javascript">
+    role.value = "{{ edit_user['role'] }}"
+
+    if ("{{ user['id'] }}" != "{{ edit_user['id'] }}") {
+        role.disabled = false;
+    }
+
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+
+    document.getElementById("deleteForm").addEventListener('submit', (async function() {
+        const formElement = document.getElementById("deleteForm");
+        const data = new URLSearchParams(new FormData(formElement));
+        const status = await fetch(
+            "/delete?user={{ edit_user['id'] }}",
+            {
+                method: 'POST',
+                body: data,
+            }).then((res)=>res.json());
+
+        if (status.status) {
+            const confirmationCard = document.createElement('div');
+            confirmationCard.classList.add("card");
+            confirmationCard.classList.add("border-success");
+            confirmationCard.classList.add("d-block");
+            confirmationCard.classList.add("m-5");
+            confirmationCard.classList.add("w-auto");
+            confirmationCard.classList.add("h-auto");
+
+            const confirmationCardBody = document.createElement('div');
+            confirmationCardBody.classList.add('card-body');
+            confirmationCardBody.classList.add('text-success');
+
+            const confirmationCardTitle = document.createElement('h5');
+            confirmationCardTitle.classList.add("card-title");
+            confirmationCardTitle.innerHTML = `<i class="bi bi-check-circle"></i>` + " Account deleted";
+
+            const confirmationCardText = document.createElement('p');
+            confirmationCardText.classList.add("card-text");
+            confirmationCardText.innerText = `Account '{{ edit_user["id"] }}' has been successfully deleted. You will be redirected back to the dashboard.`;
+
+            confirmationCardBody.appendChild(confirmationCardTitle);
+            confirmationCardBody.appendChild(confirmationCardText);
+            confirmationCard.appendChild(confirmationCardBody);
+            document.getElementById('deleteCard').remove();
+            document.getElementById('editForm').innerHTML = '';
+            document.getElementById('editForm').appendChild(confirmationCard);
+            
+            await delay(3000);
+            window.location.pathname = "/";
+        }
+    }), false);
+</script>
+{% endblock %}

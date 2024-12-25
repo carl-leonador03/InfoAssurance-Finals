@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<div class="h-100 d-flex min-vh-100 align-items-center justify-content-center">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="card mx-auto my-auto">
+            <div class="card-header flex-row d-flex">
+                <h4 class="card-title flex-grow-1">Log in</h4>
+                <div class="justify-content-md-end">
+                    <button type="button" id="btnSwitch" class="btn btn-dark w-auto"><i class="bi bi-moon-fill"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="/login" method="POST" id="loginForm">
+                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-key-fill"></i></span>
+                        <input type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" required>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <button type="submit" form="loginForm" class="btn btn-primary">Log In</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    setTheme("light");
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+<!-- This site should only be accessible by an admin account -->
+{% extends 'base.html' %}
+{% block head %}
+<script type="text/javascript">
+const passwordField = document.getElementsByName('password')[0];
+const regex = RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[-+_!@#$%^&*.,?]).+$')
+
+function checkPassword() {
+    if (regex.test(passwordField.value)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+</script>
+{% endblock %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<div class="h-100 d-flex align-items-center min-vh-100 justify-content-center">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="card mx-auto my-auto">
+            <div class="card-header flex-row d-flex">
+                <h4 class="card-title flex-grow-1">Register User</h4>
+                <div class="justify-content-md-end">
+                    <button type="button" id="btnSwitch" class="btn btn-dark w-auto"><i class="bi bi-moon-fill"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="/register" method="POST" autocomplete="new" id="registerForm">
+                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-at"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping" required>
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-person-badge"></i></span>
+                        <select class="form-select" name="role_id" aria-label="Role select" required aria-required="true">
+                            <option selected disabled value="">-- Choose role --</option>
+                            {% for role in roles %}
+                            <option value="{{ role['id'] }}">{{ role['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mt-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" class="form-control" name="name" placeholder="Name" aria-label="Name" aria-describedby="addon-wrapping" required>
+                    </div>
+                    <div class="input-group mt-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="newPassword" name="password" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" onblur="checkVerify();" required>
+                    </div>
+                    <div class="form-text text-danger" id="invalidNewPassword">
+                        Password must include at least one uppercase letter, one lowercase letter, one number, and one special character (-+_!@#$%^&=*.,?).
+                    </div>
+                    <div class="input-group mt-3">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-key-fill"></i></span>
+                        <input type="password" class="form-control" id="verifyPassword" name="vPassword" placeholder="Verify Password" aria-label="Verify Password" aria-describedby="addon-wrapping" onblur="checkVerify();" required>
+                    </div>
+                    <div class="form-text text-danger basic-addon4" id="invalidVerifyPassword">
+                        Passwords don't match.
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-1">
+                    <button type="button" class="btn btn-secondary" onclick="(()=>{window.location.pathname='/admin'})();">Cancel</button>
+                    <button type="submit" form="registerForm" class="btn btn-primary">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    setTheme("light");
+</script>
+{% endblock %}

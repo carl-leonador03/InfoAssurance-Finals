@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block navbarImage %}
+{% if not user['pfp'][1] %}
+<img src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="48px" height="48px" style="border-radius: 50%; object-fit: cover;">
+{% else %}
+<img src="data:image/{{ user['pfp'][0] }};base64,{{ user['pfp'][1] }}" width="48px" height="48px" style="border-radius: 50%; object-fit: cover;">
+{% endif %}
+{% endblock %}
+{% block offcanvasNavbarHeader %}
+<span class="offcanvas-title">
+    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}</h5>
+    {{ user['username'] }}
+</span>
+{% endblock %}
+{% block offcanvasNavbarBody %}
+<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+    <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/profile">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="/preferences">Preferences</a>
+    </li>
+    {% if user['role_id'] == 1 %}
+    <li class="nav-item">
+        <a class="nav-link" href="/logs">Audit logs</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}
+{% block offcanvasNavbarFooter %}
+<div class="card-body bg-body-secondary">
+    <form action="/logout">
+        <button class="btn btn-outline-danger" type="submit">Log out</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card m-5 p-3">
+    <h3 class="card-header">{% block preferencesTitle %}Preferences{% endblock %}</h3>
+</div>
+<div id="editForm">
+    <a name="details"></a>
+    <div class="card m-5">
+        <h5 class="card-header">User details</h5>
+        <div class="card-body">
+            {% block userdetailsForm %}
+            <form action="/preferences?modify=details" method="POST" autocomplete="off" aria-autocomplete="none">
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <p class="card-text">Edit your profile details</p>
+                <label for="displayname" class="form-label">Display Name</label>
+                <div class="input-group">
+                    <input type="text" name="displayname" class="form-control" id="basic-text" placeholder="{{ user['name'] }}" aria-placeholder="{{ user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your profile display name
+                </div>
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                    <input type="text" name="username" class="form-control" id="basic-text" placeholder="{{ user['username'] }}" aria-placeholder="{{ user['username'] }}" aria-label="Edit Username" aria-describedby="basic-addon4">
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your username
+                </div>
+                <label for="address" class="form-label">Address</label>
+                <div class="input-group">
+                    <input type="text" name="address" class="form-control" id="basic-text" placeholder="{{ user['address'] }}" aria-placeholder="{{ user['address'] }}" aria-label="Edit Address" aria-describedby="basic-addon4">
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your address
+                </div>
+                <label for="contact" class="form-label">Contact</label>
+                <div class="input-group">
+                    <input type="tel" name="contact" class="form-control" id="basic-text" placeholder="{{ user['contact'] }}" aria-placeholder="{{ user['contact'] }}" aria-label="Edit Contact" aria-describedby="basic-addon4">
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your contact number
+                </div>
+                <label for="bio" class="form-label">Bio</label>
+                <div class="input-group">
+                    <textarea class="form-control" name="bio" placeholder="{{ user['bio'] }}" aria-placeholder="{{ user['bio'] }}" aria-label="Edit Bio" aria-describedby="basic-addon4"></textarea>
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your bio
+                </div>
+                <label for="theme" class="form-label">Theme</label>
+                <div class="input-group">
+                    <select class="form-select" id="theme" name="theme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+                <div class="form-text mb-3" id="basic-addon4">
+                    Edit your preferred site theme
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+            {% endblock %}
+        </div>
+    </div>
+    <a name="pfp"></a>
+    <div class="card m-5">
+        <h5 class="card-header">Profile Picture</h5>
+        <div class="card-body">
+            <p class="card-text">Change your current profile picture</p>
+            {% block pfpForm %}
+            {% if not user['pfp'][1] %}
+            <img src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
+            {% else %}
+            <img src="data:image/{{ user['pfp'][0] }};base64,{{ user['pfp'][1] }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
+            {% endif %}
+            <form action="/preferences?modify=pfp" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <div class="input-group mb-3 mt-3">
+                    <input type="file" name="pfp" id="newPfp" class="form-control mb-3" required aria-required="true">
+                </div>
+                <div class="form-text mt-1 mb-2" id="basic-addon3">
+                    Your new selected profile picture:
+                </div>
+                <img id="previewPfp" src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;" alt="your new pfp">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-primary" type="submit">Update</button>
+                </div>
+            </form>
+            {% endblock %}
+        </div>
+    </div>
+    <a name="password"></a>
+    <div class="card m-5">
+        <h5 class="card-header">Update Password</h5>
+        <div class="card-body">
+            <p class="card-text">Change your current password</p>
+            {% block passwordForm %}
+            <form action="/preferences?modify=password" method="POST">
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <div class="input-group mb-1 mt-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm">Current password</span>
+                    <input type="password" id="currentPassword" class="form-control" required>
+                </div>
+                <div class="input-group mb-1 mt-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm">New password</span>
+                    <input type="password" name="newPassword" id="newPassword" class="form-control" onblur="checkVerify();" required>
+                </div>
+                <div class="form-text text-danger basic-addon4" id="invalidNewPassword">
+                    Password must include at least one uppercase letter, one lowercase letter, and one special character (-+_!@#$%^&=*.,?).
+                </div>
+                <div class="input-group mb-1 mt-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm">Verify new password</span>
+                    <input type="password" id="verifyPassword" class="form-control" onblur="checkVerify();" required>
+                </div>
+                <div class="form-text text-danger basic-addon4" id="invalidVerifyPassword">
+                    Passwords don't match.
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <button class="btn btn-primary" type="submit">Update password</button>
+                </div>
+            </form>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% block moreForms %}
+{% endblock %}
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    newPfp.onchange = evt => {
+        const [file] = newPfp.files
+        if (file) {
+            previewPfp.src = URL.createObjectURL(file)
+        }
+    }
+    theme.value = "{{ user['theme'] }}";
+    setTheme("{{ user['theme'] }}");
+    username.value = '';
+</script>
+{% endblock %}
