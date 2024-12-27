@@ -4,7 +4,13 @@
 {% endblock %}
 {% block offcanvasNavbarHeader %}
 <span class="offcanvas-title">
-    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}</h5>
+    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}
+        {% if user['role']['id'] == 0 %}
+        <span class="badge text-bg-success">SYSTEM</span>
+        {% elif user['role']['id'] == 1 %}
+        <span class="badge text-bg-primary">ADMIN</span>
+        {% endif %}
+    </h5>
     {{ user['username'] }}
 </span>
 {% endblock %}
@@ -19,7 +25,7 @@
     <li class="nav-item">
         <a class="nav-link active" aria-current="page" href="/preferences">Preferences</a>
     </li>
-    {% if user['role']['id'] == 1 %}
+    {% if user['role']['id'] <= 1 %}
     <li class="nav-item">
         <a class="nav-link" href="/logs">Audit logs</a>
     </li>
@@ -56,7 +62,7 @@
 {% else %}
 <div class="card m-5">
     <h1 class="card-header border-bottom">
-        {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+        {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
         Editing {{ edit_user['username'] }}
         {% else %}
         Preferences
@@ -68,33 +74,33 @@
     <div class="card m-5">
         <h5 class="card-header">User details</h5>
         <div class="card-body">
-            {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+            {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
             <form action="/edit/{{ edit_user['id'] }}?modify=details" method="POST" autocomplete="off" aria-autocomplete="none">
             {% else %}
             <form action="/preferences?modify=details" method="POST" autocomplete="off" aria-autocomplete="none">
             {% endif %}
                 <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
-                {% if user['role']['id'] == 1 %}
+                {% if user['role']['id'] <= 1 %}
                 <input type="hidden" name="user_id" value = "{{ edit_user['id'] }}" />
                 {% else %}
                 <input type="hidden" name="user_id" value = "{{ user['id'] }}" />
                 {% endif %}
                 <input type="text" name="username" class="d-none">
-                {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                 <p class="card-text">Edit {{ edit_user['username'] }}'s profile details</p>
                 {% else %}
                 <p class="card-text">Edit your profile details</p>
                 {% endif %}
                 <label for="displayname" class="form-label">Display Name</label>
                 <div class="input-group">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
-                    <input type="text" name="displayname" pattern="[a-zA-Z0-9]+" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ edit_user['name'] }}" aria-placeholder="{{ edit_user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
+                    <input type="text" name="displayname" pattern="[a-zA-Z0-9]+" pattern="[a-zA-Z0-9]+" class="form-control" id="basic-text" placeholder="{{ edit_user['name'] }}" aria-placeholder="{{ edit_user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
                     {% else %}
-                    <input type="text" name="displayname" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ user['name'] }}" aria-placeholder="{{ user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
+                    <input type="text" name="displayname" pattern="[a-zA-Z0-9]+" class="form-control" id="basic-text" placeholder="{{ user['name'] }}" aria-placeholder="{{ user['name'] }}" aria-label="Edit Display Name" aria-describedby="basic-addon4">
                     {% endif %}
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s profile display name
                     {% else %}
                     Edit your profile display name
@@ -102,14 +108,14 @@
                 </div>
                 <label for="username" class="form-label">Username</label>
                 <div class="input-group">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     <input type="text" name="usernamee" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ edit_user['username'] }}" aria-placeholder="{{ edit_user['username'] }}" aria-label="Edit Username" aria-describedby="basic-addon4">
                     {% else %}
                     <input type="text" name="usernamee" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ user['username'] }}" aria-placeholder="{{ user['username'] }}" aria-label="Edit Username" aria-describedby="basic-addon4">
                     {% endif %}
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s username
                     {% else %}
                     Edit your username
@@ -117,14 +123,14 @@
                 </div>
                 <label for="address" class="form-label">Address</label>
                 <div class="input-group">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     <input type="text" name="address" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ edit_user['address'] }}" aria-placeholder="{{ edit_user['address'] }}" aria-label="Edit Address" aria-describedby="basic-addon4">
                     {% else %}
                     <input type="text" name="address" pattern="[a-zA-Z0-9]+"  class="form-control" id="basic-text" placeholder="{{ user['address'] }}" aria-placeholder="{{ user['address'] }}" aria-label="Edit Address" aria-describedby="basic-addon4">
                     {% endif %}
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s address
                     {% else %}
                     Edit your address
@@ -132,14 +138,14 @@
                 </div>
                 <label for="contact" class="form-label">Contact</label>
                 <div class="input-group">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     <input type="tel" name="contact" pattern="[0-9]+" maxlength="11" class="form-control" id="basic-text" placeholder="{{ edit_user['contact'] }}" aria-placeholder="{{ edit_user['contact'] }}" aria-label="Edit Contact" aria-describedby="basic-addon4">
                     {% else %}
                     <input type="tel" name="contact" pattern="[0-9]+" maxlength="11" class="form-control" id="basic-text" placeholder="{{ user['contact'] }}" aria-placeholder="{{ user['contact'] }}" aria-label="Edit Contact" aria-describedby="basic-addon4">
                     {% endif %}
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s contact number
                     {% else %}
                     Edit your contact number
@@ -147,14 +153,14 @@
                 </div>
                 <label for="bio" class="form-label">Bio</label>
                 <div class="input-group">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     <textarea class="form-control" name="bio" pattern="[a-zA-Z0-9]+" placeholder="{{ edit_user['bio'] }}" aria-placeholder="{{ edit_user['bio'] }}" aria-label="Edit Bio" aria-describedby="basic-addon4"></textarea>
                     {% else %}
                     <textarea class="form-control" name="bio" pattern="[a-zA-Z0-9]+" placeholder="{{ user['bio'] }}" aria-placeholder="{{ user['bio'] }}" aria-label="Edit Bio" aria-describedby="basic-addon4"></textarea>
                     {% endif %}
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s bio
                     {% else %}
                     Edit your bio
@@ -168,19 +174,16 @@
                     </select>
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
-                    {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                    {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                     Edit {{ edit_user['username'] }}'s preferred site theme
                     {% else %}
                     Edit your preferred site theme
                     {% endif %}
                 </div>
-                {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                 <label for="theme" class="form-label">Role</label>
                 <div class="input-group">
-                    <select class="form-select" id="role" name="role" disabled>
-                        <option value="1">ADMIN</option>
-                        <option value="2">USER</option>
-                    </select>
+                    <select class="form-select" id="role" name="role" disabled></select>
                 </div>
                 <div class="form-text mb-3" id="basic-addon4">
                     Edit user's role
@@ -197,18 +200,18 @@
         <h5 class="card-header">Profile Picture</h5>
         <div class="card-body">
             <p class="card-text">Change your current profile picture</p>
-            {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+            {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
             <img src="../{{ edit_user['pfp']['image_path'] }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
             {% else %}
             <img src="../{{ user['pfp']['image_path'] }}" width="64px" height="64px" style="border-radius: 50%; object-fit: cover;">
             {% endif %}
-            {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+            {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
             <form action="/edit/{{ edit_user['id'] }}?modify=pfp" method="POST" enctype="multipart/form-data">
             {% else %}
             <form action="/preferences?modify=pfp" method="POST" enctype="multipart/form-data">
             {% endif %}
                 <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
-                {% if user['role']['id'] == 1 %}
+                {% if user['role']['id'] <= 1 %}
                 <input type="hidden" name="user_id" value = "{{ edit_user['id'] }}" />
                 {% else %}
                 <input type="hidden" name="user_id" value = "{{ user['id'] }}" />
@@ -234,13 +237,13 @@
         <h5 class="card-header">Update Password</h5>
         <div class="card-body">
             <p class="card-text">
-                {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+                {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
                 Change {{ edit_user['username'] }}'s password
                 {% else %}
                 Change your current password
                 {% endif %}
             </p>
-            {% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+            {% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
             <form action="/edit/{{ edit_user['id'] }}?modify=password" method="POST">
             {% else %}
             <form action="/preferences?modify=password" method="POST">
@@ -278,7 +281,7 @@
         </div>
     </div>
 </div>
-{% if user['role']['id'] == 1 and user['id'] != edit_user['id'] %}
+{% if user['role']['id'] <= 1 and user['id'] != edit_user['id'] %}
 <div class="card border-danger m-5" id="deleteCard">
     <h5 class="card-header text-danger">Delete Account</h5>
     <div class="card-body text-danger">
@@ -348,12 +351,27 @@
 </script>
 {% endif %}
 {% if not edit_user == None %}
-{% if user['role']['id'] == 1 %}
+{% if user['role']['id'] <= 1 %}
 <script type="text/javascript">
-    role.value = "{{ edit_user['role']['id'] }}";
+    (async function () {
+        const rolesSelect = document.getElementById("role");
+        let roles = await fetch("/fetch?roles").then((res) => res.json());
+        for (role of roles) {
+            if (role.id != 0) {
+                const newRoleOption = document.createElement("option");
+                newRoleOption.value = role.id;
+                newRoleOption.innerText = role.name.toUpperCase();
+                rolesSelect.appendChild(newRoleOption);
+            }
+        }
+        $("#role")[0].value = "{{ edit_user['role']['id'] }}"
+    })();
 
-    if ("{{ user['id'] }}" != "{{ edit_user['id'] }}") {
+    if (("{{ user['id'] }}" != "{{ edit_user['id'] }}") & "{{ edit_user['id'] }}" != "0") {
         role.disabled = false;
+    }
+    if (("{{ user['id'] }}" == "0") & "{{ edit_user['id'] }}" == "{{ user['id'] }}") {
+        role.options[0].innerText = 'SYSTEM'
     }
 
     const delay = ms => new Promise(res => setTimeout(res, ms));

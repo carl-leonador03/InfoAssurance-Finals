@@ -65,17 +65,6 @@ class Role(dict):
     def __repr__(self) -> str:
         return f"Role (id={self['id']} name='{self['name']}' perms={self['perms']})"
 
-ROLES = [
-    Role(1, 'admin', ('login', 'dashboard', 'profile', 'preferences', 'register', 'edit', 'logs', 'fetch', 'delete', 'logout')),
-    Role(2, 'user', ('login', 'dashboard', 'profile', 'preferences', 'logout'))
-]
-
-def getRole(role_id: int) -> Role | None:
-    """Gets :class:`Role` object for specified `role_id`."""
-    for role in ROLES:
-        if role['id'] == role_id:
-            return role
-
 class ProfilePicture(dict):
     """Profile Picture :type:`dict`-based object that stores the user's profile picture."""
     default = {
@@ -155,7 +144,7 @@ class User(dict):
         "id":           0,
         "username":     'user',
         "name":         'User',
-        "role":         getRole(2),
+        "role":         Role(2, 'user', ("login", "dashboard", "profile", "preferences", "logout")),
         "address":      'Location',
         "pfp":          ProfilePicture('user'),
         "contact":      '09123456789',
@@ -165,7 +154,7 @@ class User(dict):
 
     def __init__(self, **kwargs):
         if any([(key if key != 'role_id' else 'role') in self.default.keys() for key in kwargs]):
-            role = getRole(int(kwargs['role_id'])) if 'role_id' in kwargs.keys() else self.default['role']
+            role = self.default['role'] if 'role' not in kwargs.keys() or not isinstance(kwargs['role'], Role) else kwargs['role']
             pfp = ProfilePicture(kwargs['username'], kwargs['pfp']) if 'pfp' in kwargs.keys() else self.default['pfp']
 
             super(User, self).__init__(
@@ -207,7 +196,7 @@ class MySQLDatabase(Database):
                 return User(
                     id =        result['id'],
                     username =  result['username'],
-                    role_id =   result['role_id'],
+                    role =      self.getRole(int(result['role_id'])),
                     name =      result['name'],
                     address =   result['address'],
                     pfp =       result['pfp'],
@@ -228,11 +217,16 @@ class MySQLDatabase(Database):
         results = self.queryGetAll(
             "SELECT u.*, d.* FROM users AS u, users_data AS d WHERE u.id=d.user_id"
         )
+        
         users = []
 
         for user in results:
             _=user.pop('passwordHash')
             _=user.pop('user_id')
+            user['role'] = self.getRole(
+                int(user['role_id'])
+            )
+            _=user.pop('role_id')
             users.append(User(**user))
         
         return tuple(users)
@@ -371,6 +365,104 @@ class MySQLDatabase(Database):
         
         else:
             return False
+
+    def getRole(self, id: int|str) -> Role:
+        """Fetches a :class:`Role` object from the database using the specified :param:`id` (:type:`int` or :type:`str`)."""
+        if isinstance(id, str|int):
+            role = self.queryGet(
+                "SELECT * FROM roles WHERE " + "id=%s" if isinstance(id, int) else "name=%s",
+                (id, )
+            )
+
+            role['perms'] = role['perms'].split(",")
+
+            for i in range(len(role['perms'])):
+                if "[" in role['perms'][i]:
+                    role['perms'][i] = role['perms'][i].replace("[", "")
+                elif "]" in role['perms'][i]:
+                    role['perms'][i] = role['perms'][i].replace("]", "")
+                role['perms'][i] = role['perms'][i].strip().replace("'", "")
+                role['perms'][i] = role['perms'][i].strip().replace('"', "")
+
+            return Role(role['id'], role['name'], tuple(role['perms']))
+        
+        else:
+            raise TypeError("Expected 'str' or 'int', not '" + type(id).__name__ +"'.")
+
+    
+    def getRoles(self) -> tuple[Role]:
+        """Fetches a :type:`tuple` of :class:`Role` objects from the database."""
+        roles = self.queryGetAll(
+            "SELECT * FROM roles"
+        )
+
+        roles_tuple = ()
+
+        for role in roles:
+
+            role['perms'] = role['perms'].split(",")
+            for i in range(len(role['perms'])):
+                if "[" in role['perms'][i]:
+                    role['perms'][i] = role['perms'][i].replace("[", "")
+                elif "]" in role['perms'][i]:
+                    role['perms'][i] = role['perms'][i].replace("]", "")
+                role['perms'][i] = role['perms'][i].strip().replace("'", "")
+                role['perms'][i] = role['perms'][i].strip().replace('"', "")
+
+            roles_tuple += (
+                Role(
+                    role['id'],
+                    role['name'],
+                    tuple(role['perms'])
+                )
+            ,)
+        
+        return roles_tuple
+    
+    def addRole(self, new_role: Role, csrf_token: str) -> int:
+        """Adds a new role into the database. Requires CSRF token."""
+        if csrf_token:
+            existing_roles = self.getRoles()
+
+            if new_role['id'] not in [role['id'] for role in existing_roles]:
+                self.querySet(
+                    "INSERT INTO roles (id, name, perms) VALUES (%s,%s,%s)",
+                    (new_role['id'], new_role['name'], str(new_role['perms']))
+                )
+
+                return 0
+            
+            else:
+                return 1
+        
+        else:
+            return 2
+    
+    def removeRole(self, role: Role, csrf_token: str) -> bool:
+        """Removes a existing role from the database. Requires CSRF token."""
+        if csrf_token:
+            if role['id'] <= 2:
+                users_with_role = self.queryGetAll(
+                    "SELECT * FROM users WHERE role_id=%s",
+                    (role['id'],)
+                )
+
+                if len(users_with_role) > 0:
+                    self.querySet(
+                        "UPDATE users SET role_id=2 WHERE role_id=%s",
+                        (role['id'],)
+                    )
+
+                self.querySet(
+                    "DELETE FROM roles WHERE id=%s",
+                    (role['id'],)
+                )
+
+                return True
+            else:
+                return False
+
+        return False
     
     def auditChanges(self, user: User|dict, event_type: str, description: str) -> None:
         """Documents any changes into an audit log in the database.
@@ -386,7 +478,9 @@ class MySQLDatabase(Database):
         - `"logged-in"`
         - `"logged-out"`
         - `"created-user"`
+        - `"created-role"`
         - `"deleted-user"`
+        - `"deleted-role"`
         - `"updated-profile"`
         - `"updated-pfp"`
         - `"updated-password"`
@@ -399,7 +493,8 @@ class MySQLDatabase(Database):
             "logged-in", "logged-out",
             "created-user", "deleted-user",
             "updated-profile", "updated-pfp", "updated-password",
-            "edited-profile", "edited-pfp", "edited-password"
+            "edited-profile", "edited-pfp", "edited-password",
+            "created-role", "deleted-role"
         ]
 
         if event_type in ACCEPTED_TYPES:

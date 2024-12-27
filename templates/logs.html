@@ -1,4 +1,16 @@
 {% extends 'dashboard.html' %}
+{% block offcanvasNavbarHeader %}
+<span class="offcanvas-title">
+    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}
+        {% if user['role']['id'] == 0 %}
+        <span class="badge text-bg-success">SYSTEM</span>
+        {% elif user['role']['id'] == 1 %}
+        <span class="badge text-bg-primary">ADMIN</span>
+        {% endif %}
+    </h5>
+    {{ user['username'] }}
+</span>
+{% endblock %}
 {% block offcanvasNavbarBody %}
 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
     <li class="nav-item">
@@ -65,10 +77,17 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif log['event_type'] == 'created-user' %}
+{% elif 'created' in log['event_type'] %}
 <div class="card border-success mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-success"><i class="bi bi-check2-square"></i> Created Account</h5>
+        <h5 class="text-success">
+            <i class="bi bi-pencil"></i>
+            {% if log['event_type'] == 'created-user' %}
+            Created Account
+            {% elif log['event_type'] == 'created-role' %}
+            Created Role
+            {% endif %}
+        </h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -122,10 +141,17 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif log['event_type'] == 'deleted-user' %}
+{% elif 'deleted' in log['event_type'] %}
 <div class="card border-danger mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-danger"><i class="bi bi-trash3"></i> Deleted Account</h5>
+        <h5 class="text-danger">
+            <i class="bi bi-trash3"></i>
+            {% if log['event_type'] == 'deleted-user' %}
+            Deleted Account
+            {% elif log['event_type'] == 'deleted-role' %}
+            Deleted Role
+            {% endif %}
+        </h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>

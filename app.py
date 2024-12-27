@@ -1,10 +1,8 @@
-from re import escape
 from flask import Flask, request, render_template, redirect, session, flash, url_for, jsonify
 from flask_wtf import CSRFProtect
 
 import utils    # utils.py
 import asyncio, threading   # for running the auto-backup system for the database.
-import copy
 
 app = Flask(__name__)
 app.secret_key = b'_g3nEr41Ly;5p34k1n6'
@@ -18,7 +16,7 @@ def check_session():
 
     if 'user' not in session.keys(): # init
         session['user'] = utils.User()
-        session['role'] = utils.getRole(2)
+        session['role'] = mysqldb.getRole(2)
         flash("You must be logged in before proceeding.", 'warning')
         return redirect('login')
     
@@ -46,6 +44,31 @@ def check_session():
 def dashboard() -> str:
     """Main home page endpoint."""
     return render_template('dashboard.html', user=session['user'])
+
+@app.route('/add_role', methods=['POST'])
+def add_role():
+    if request.method == 'POST':
+        if session['role']['id'] <= 1:
+            last_id = max([role['id'] for role in mysqldb.getRoles()])
+
+            new_role = utils.Role(
+                last_id + 1,
+                request.form['rolename'],
+                list(request.form.getlist('perms'))
+            )
+
+            mysqldb.addRole(new_role, request.form['csrf_token'])
+
+            mysqldb.auditChanges(
+                session['user'],
+                "created-role",
+                f"User '{session['user']['username']}' created a new role '{new_role['name']}' with set permissions: " + str(new_role['perms']).replace("[", "").replace("]", "")
+            )
+            
+            return jsonify({'status': True})
+        
+        else:
+            return jsonify({'status': False})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -91,14 +114,14 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        roles = utils.ROLES
-        return render_template('register.html', roles=roles)
+        roles = mysqldb.getRoles()
+        return render_template('register.html', user=session['user'], roles=roles)
     
     elif request.method == 'POST':
         new_user = utils.User(
             name =      request.form['name'],
             username =  request.form['username'],
-            role_id =   request.form['role_id']
+            role =   mysqldb.getRole(int(request.form['role_id']))
         )
 
         user_exists = mysqldb.getUser(new_user['username'])
@@ -135,7 +158,7 @@ def profile(id: int):
 def edit(id:int = None):
     """Preferences endpoint (for users)"""
     if request.method == 'GET':
-        if session['role']['id'] == 1:
+        if session['role']['id'] <= 1:
             if request.path == '/preferences':
                 return render_template("preferences.html", user=session['user'], edit_user=session['user'])
             else:
@@ -167,7 +190,7 @@ def edit(id:int = None):
                     edited_user['theme'] = current_user['theme'] if request.form['theme'] == current_user['theme'] else request.form['theme']
 
                     if 'edit' in request.path:
-                        edited_user['role'] = current_user['role'] if request.form['role'] == current_user['role']['id'] else utils.getRole(int(request.form['role']))
+                        edited_user['role'] = current_user['role'] if request.form['role'] == current_user['role']['id'] else mysqldb.getRole(int(request.form['role']))
 
                     status = mysqldb.editUserInfo(current_user, edited_user)
 
@@ -287,6 +310,16 @@ def fetch():
             case "users":
                 users = mysqldb.getUsers()
                 return jsonify(users)
+            
+            case "roles":
+                roles = mysqldb.getRoles()
+                return jsonify(roles)
+            
+            case "perms":
+                perms = [perm.rule.lstrip("/").split("/")[0] for perm in app.url_map.iter_rules()]
+                perms.remove("")
+                perms.remove("static")
+                return jsonify({"perms": perms})
 
 @app.route("/delete", methods=['POST'])
 def delete():
@@ -301,6 +334,19 @@ def delete():
 
                 mysqldb.auditChanges(
                     session['user'], "deleted-user", f"User \'{session['user']['username']}\' deleted user account \'{user['username']}\'"
+                )
+
+                return jsonify({'status': status})
+
+            case "role":
+                role = mysqldb.getRole(int(request.args['role']))
+
+                status = mysqldb.removeRole(
+                    role, request.form['csrf_token']
+                )
+
+                mysqldb.auditChanges(
+                    session['user'], "deleted-role", f"User '{session['user']['username']}' deleted role {role['name']}."
                 )
 
                 return jsonify({'status': status})

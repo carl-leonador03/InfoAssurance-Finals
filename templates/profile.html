@@ -7,7 +7,9 @@
 {% block offcanvasNavbarHeader %}
 <span class="offcanvas-title">
     <h5 id="offcanvasNavbarLabel">{{ user['name'] }}
-        {% if user['role']['id'] == 1 %}
+        {% if user['role']['id'] == 0 %}
+        <span class="badge text-bg-success">SYSTEM</span>
+        {% elif user['role']['id'] == 1 %}
         <span class="badge text-bg-primary">ADMIN</span>
         {% endif %}
     </h5>
@@ -75,7 +77,11 @@
             <div class="card-body d-flex flex-column">
                 <h3>
                     {{ profile['name'] }}
-                    {% if user['role']['id'] == 1 %}
+                    {% if profile['role']['id'] == 0 %}
+                    <span class="badge text-bg-success">
+                        SYSTEM
+                    </span>
+                    {% elif profile['role']['id'] == 1 %}
                     <span class="badge text-bg-primary">
                         ADMIN
                     </span>
@@ -83,7 +89,7 @@
                 </h3>
                 <span>{{ profile['username'] }}</span>
             </div>
-            {% if user['id'] == profile['id'] or user['role']['id'] == 1 %}
+            {% if user['id'] == profile['id'] or (user['role']['id'] <= 1 and profile['id'] != 0 ) %}
             <button type="button" class="btn btn-secondary flex-end" style="width:fit-content;height:fit-content;"
                 onclick="onClickEdit('details');"
                 title="Edit Profile">

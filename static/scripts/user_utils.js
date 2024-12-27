@@ -1,6 +1,5 @@
 async function fetchUsers() {
     const users = await fetch("/fetch?users").then((res) => res.json());
-
     const userDiv = document.querySelector(".users");
     userDiv.innerHTML = '';
     const userCounter = document.getElementById('userCounter');
@@ -39,13 +38,17 @@ async function fetchUsers() {
         const userRoleBadge = document.createElement('span');
         userRoleBadge.classList.add('badge');
         switch (user.role.id) {
+            case 0:
+                userRoleBadge.classList.add('text-bg-success');
+                userRoleBadge.innerText = "SYSTEM";
+                break;
             case 1:
                 userRoleBadge.classList.add('text-bg-primary');
                 userRoleBadge.innerText = "ADMIN";
                 break;
-            case 2:
+            default:
                 userRoleBadge.classList.add('text-bg-secondary');
-                userRoleBadge.innerText = "USER";
+                userRoleBadge.innerText = user.role.name.toUpperCase();
                 break;
         }
         userName.appendChild(userRoleBadge);
@@ -69,7 +72,7 @@ async function fetchUsers() {
             window.location.href = url + "/profile/" + user.id;
         }
         userProfileButton.innerHTML = `<i class="bi bi-person-circle"></i>`;
-
+        
         const userEditButton = document.createElement('button');
         userEditButton.type = "button";
         userEditButton.classList.add('btn');
@@ -84,7 +87,11 @@ async function fetchUsers() {
 
         newUserCardBody.appendChild(userDetails);
         newUserCardBody.appendChild(userProfileButton);
-        newUserCardBody.appendChild(userEditButton);
+
+        if (user.id != 0) {
+            newUserCardBody.appendChild(userEditButton);
+        }
+
         newUserCard.appendChild(newUserCardBody);
         userDiv.appendChild(newUserCard);
     }

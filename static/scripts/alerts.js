@@ -27,7 +27,7 @@ function appendAlert(message, type) {
 }
 
 function loadMessages (flashed_messages_str) {
-    console.log(flashed_messages_str)
+    console.log(flashed_messages_str);
     var flash_messages;
     try {
         flash_messages = JSON.parse(flashed_messages_str.replaceAll('&#39;', '"').replace(/\(/g, "[").replace(/\)/g, "]").replaceAll('&#34;', "'"));

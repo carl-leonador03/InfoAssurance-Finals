@@ -18,12 +18,10 @@ function setTheme(theme) {
     }
 }
 
+function limitInput(e) {
+    let t = e.target;
+    let badValues = /[^a-zA-Z]+/g;
+    t.value = t.value.replace(badValues, '');
+}
 
-document.getElementById('btnSwitch').addEventListener('click',()=>{
-    if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-        setTheme('light');
-    }
-    else {
-        setTheme('dark');
-    }
-});
+document.getElementsByName("rolename")[0].addEventListener('input', limitInput);

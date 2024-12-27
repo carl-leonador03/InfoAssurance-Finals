@@ -48,3 +48,18 @@ body {
 .customButton {
     border-style: dashed !important;
 }
+
+.choices {
+    display: contents;
+    color: var(--bs-modal-color);
+}
+
+.choices__inner,
+.choices__input,
+.choices__list {
+    background-color: var(--bs-modal-bg) !important;
+}
+
+.is-highlighted {
+    background-color: var(--bs-secondary-text-emphasis) !important;
+}

@@ -40,5 +40,15 @@
 {% block scripts %}
 <script type="text/javascript">
     setTheme("light");
+
+    document.getElementById('btnSwitch').addEventListener('click',()=>{
+        console.log('ye');
+        if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+            setTheme('light');
+        }
+        else {
+            setTheme('dark');
+        }
+    });
 </script>
 {% endblock %}

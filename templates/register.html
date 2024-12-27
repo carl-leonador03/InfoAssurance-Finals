@@ -37,7 +37,11 @@ function checkPassword() {
                         <select class="form-select" name="role_id" aria-label="Role select" required aria-required="true">
                             <option selected disabled value="">-- Choose role --</option>
                             {% for role in roles %}
+                            {% if user['role']['id'] == 0 and role['id'] == 0 %}
                             <option value="{{ role['id'] }}">{{ role['name'] }}</option>
+                            {% elif user['role'] != 0 and role['id'] != 0 %}
+                            <option value="{{ role['id'] }}">{{ role['name'] }}</option>
+                            {% endif %}
                             {% endfor %}
                         </select>
                     </div>
@@ -69,7 +73,7 @@ function checkPassword() {
             </div>
             <div class="card-footer">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-1">
-                    <button type="button" class="btn btn-secondary" onclick="(()=>{window.location.pathname='/admin'})();">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="(()=>{window.location.pathname='/'})();">Cancel</button>
                     <button type="submit" form="registerForm" class="btn btn-primary">Register</button>
                 </div>
             </div>
@@ -80,5 +84,15 @@ function checkPassword() {
 {% block scripts %}
 <script type="text/javascript">
     setTheme("light");
+
+    document.getElementById('btnSwitch').addEventListener('click',()=>{
+        console.log('ye');
+        if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+            setTheme('light');
+        }
+        else {
+            setTheme('dark');
+        }
+    });
 </script>
 {% endblock %}
