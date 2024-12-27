@@ -1,0 +1,50 @@
+.light-bg-img {
+    background-image: url("../assets/forum-bg-tile-light.png");
+    background-repeat: repeat;
+    background-size: 25%;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.dark-bg-img {
+    background-image: url("../assets/forum-bg-tile-dark.png");
+    background-repeat: repeat;
+    background-size: 25%;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body {
+    background: none;
+}
+
+.no-spaces {
+    padding: 0;
+    width: auto;
+    height: auto;
+}
+
+.customPopup {
+    opacity: 90%;
+    transition: opacity 0.5s ease;
+}
+
+.customPopup:hover {
+    opacity: 100%;
+}
+
+#invalidNewPassword {
+    display: none !important;
+}
+
+#invalidVerifyPassword {
+    display: none !important;
+}
+
+#fileTooBig {
+    display: none !important;
+}
+
+.customButton {
+    border-style: dashed !important;
+}

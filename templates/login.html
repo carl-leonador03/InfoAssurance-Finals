@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block navbar %}{% endblock %}
+{% block breadcard %}{% endblock %}
 {% block content %}
 <div class="h-100 d-flex min-vh-100 align-items-center justify-content-center">
     <div class="col-sm-6 col-sm-offset-3">
@@ -19,7 +20,13 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="addon-wrapping"><i class="bi bi-key-fill"></i></span>
-                        <input type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" required>
+                        <input type="password" id="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="password_toggle('login');">
+                                <i class="bi bi-eye" id="show_eye"></i>
+                                <i class="bi bi-eye-slash d-none" id="hide_eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

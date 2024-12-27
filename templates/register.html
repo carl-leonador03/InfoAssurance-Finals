@@ -16,6 +16,7 @@ function checkPassword() {
 </script>
 {% endblock %}
 {% block navbar %}{% endblock %}
+{% block breadcard %}{% endblock %}
 {% block content %}
 <div class="h-100 d-flex align-items-center min-vh-100 justify-content-center">
     <div class="col-sm-6 col-sm-offset-3">
@@ -47,6 +48,12 @@ function checkPassword() {
                     <div class="input-group mt-3">
                         <span class="input-group-text" id="addon-wrapping"><i class="bi bi-key"></i></span>
                         <input type="password" class="form-control" id="newPassword" name="password" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" onblur="checkVerify();" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="password_toggle('register');">
+                                <i class="bi bi-eye" id="show_eye"></i>
+                                <i class="bi bi-eye-slash d-none" id="hide_eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-text text-danger" id="invalidNewPassword">
                         Password must include at least one uppercase letter, one lowercase letter, one number, and one special character (-+_!@#$%^&=*.,?).

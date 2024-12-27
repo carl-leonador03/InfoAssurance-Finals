@@ -1,4 +1,4 @@
-{% extends 'index.html' %}
+{% extends 'dashboard.html' %}
 {% block offcanvasNavbarBody %}
 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
     <li class="nav-item">
@@ -15,13 +15,34 @@
     </li>
 </ul>
 {% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Home</a></li>
+<li class="breadcrumb-item active">Audit logs</li>
+{% endblock %}
+
 {% block content %}
-<div class="mt-5 pt-5">    </div>
+<div class="mt-5">   &nbsp; </div>
+{% set log_count = logs | length %}
+{% if log_count == 0 %}
+<div class="card m-5 text-center border-warning">
+    <h4 class="card-header">Empty audit logs</h4>
+    <div class="card-body">
+        <p class="card-text">
+            It seems that no changes were logged in yet. Try making some changes, and it will be audited into this log.
+        </p>
+        <p class="card-text text-warning">
+            If in case you didn't expect this to be empty, check if logs are being updated in the database. Otherwise,
+            someone might have cleared it off.
+        </p>
+    </div>
+</div>
+{% endif %}
 {% for log in logs %}
-{% if log['event_type'] == 'Logged in' %}
+{% if log['event_type'] == 'logged-in' %}
 <div class="card border-primary mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-primary"><i class="bi bi-box-arrow-in-left"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-primary"><i class="bi bi-box-arrow-in-left"></i> Logged In</h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -31,10 +52,10 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif log['event_type'] == 'Logged out' %}
+{% elif log['event_type'] == 'logged-out' %}
 <div class="card border-secondary mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-secondary"><i class="bi bi-box-arrow-right"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-secondary"><i class="bi bi-box-arrow-right"></i> Logged Out</h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -44,10 +65,10 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif log['event_type'] == 'Created account' %}
+{% elif log['event_type'] == 'created-user' %}
 <div class="card border-success mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-success"><i class="bi bi-check2-square"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-success"><i class="bi bi-check2-square"></i> Created Account</h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -57,10 +78,19 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif 'Updated' in log['event_type'] %}
+{% elif 'updated' in log['event_type'] %}
 <div class="card border-info mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-info"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-info">
+            <i class="bi bi-pencil"></i>
+            {% if log['event_type'] == 'updated-profile' %}
+            Updated User Profile Details
+            {% elif log['event_type'] == 'updated-pfp' %}
+            Updated User Profile Picture
+            {% elif log['event-type'] == 'updated-password' %}
+            Updated User Password
+            {% endif %}
+        </h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -70,10 +100,19 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif 'Changed' in log['event_type'] %}
+{% elif 'edited' in log['event_type'] %}
 <div class="card border-warning mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-warning"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-warning">
+            <i class="bi bi-pencil"></i>
+            {% if log['event_type'] == 'edited-profile' %}
+            Edited User Profile Details
+            {% elif log['event_type'] == 'edited-pfp' %}
+            Edited User Profile Picture
+            {% elif log['event-type'] == 'edited-password' %}
+            Edited User Password
+            {% endif %}
+        </h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
@@ -83,23 +122,10 @@
         <b>Timestamp: </b>{{ log['timestamp'] }}
     </div>
 </div>
-{% elif 'Edited' in log['event_type'] %}
-<div class="card border-warning mb-3 m-3">
-    <div class="card-header d-flex align-items-center">
-        <h5 class="text-warning"><i class="bi bi-pencil"></i> {{ log['event_type'] }}</h5>
-    </div>
-    <div class="card-body">
-        <p class="card-text"><b>User: </b>{{ log['username'] }}</p>
-        <p class="card-text">{{ log['description'] }}</p>
-    </div>
-    <div class="card-footer bg-transparent border-warning">
-        <b>Timestamp: </b>{{ log['timestamp'] }}
-    </div>
-</div>
-{% elif log['event_type'] == 'Deleted account' %}
+{% elif log['event_type'] == 'deleted-user' %}
 <div class="card border-danger mb-3 m-3">
     <div class="card-header d-flex align-items-center">
-        <h5 class="text-danger"><i class="bi bi-trash3"></i> {{ log['event_type'] }}</h5>
+        <h5 class="text-danger"><i class="bi bi-trash3"></i> Deleted Account</h5>
     </div>
     <div class="card-body">
         <p class="card-text"><b>User: </b>{{ log['username'] }}</p>

@@ -9,55 +9,7 @@
             <!-- Bootstrap CSS -->
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-            <style>
-                .light-bg-img {
-                    background-image: url("{{ url_for('static', filename='assets/forum-bg-tile-light.png') }}");
-                    background-repeat: repeat;
-                    background-size: 25%;
-                    background-position: center;
-                    background-attachment: fixed;
-                }
-
-                .dark-bg-img {
-                    background-image: url("{{ url_for('static', filename='assets/forum-bg-tile-dark.png') }}");
-                    background-repeat: repeat;
-                    background-size: 25%;
-                    background-position: center;
-                    background-attachment: fixed;
-                }
-
-                body {
-                    background: none;
-                }
-
-                .no-spaces {
-                    padding: 0;
-                    width: auto;
-                    height: auto;
-                }
-
-                .customPopup {
-                    opacity: 90%;
-                    transition: opacity 0.5s ease;
-                }
-
-                .customPopup:hover {
-                    opacity: 100%;
-                }
-
-                #invalidNewPassword {
-                    display: none !important;
-                }
-
-                #invalidVerifyPassword {
-                    display: none !important;
-                }
-
-                .customButton {
-                    border-style: dashed !important;
-                }
-
-            </style>
+            <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css') }}">
 
         <title>{% block title %}{% endblock %}</title>
         {% block head %}{% endblock %}
@@ -66,7 +18,7 @@
         <div class="forum-background-image"></div>
         <!-- Your navbar content -->
         {% block navbar %}
-        <nav class="navbar fixed-top bg-body border-bottom">
+        <nav class="navbar sticky-top bg-body border-bottom">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/">
                     <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Logo" width="32px" height="32px" class="d-inline-block align-text-top">
@@ -95,212 +47,28 @@
         </div>
 
         <!-- Your page content -->
-         {% block content %}{% endblock %}
+        {% block breadcard %}
+        <nav aria-label="breadcrumb">
+            <div class="card position-fixed ms-3 mt-2 p-3" style="max-width: fit-content; z-index: 5;">
+                <ol class="breadcrumb" style="margin-bottom: 0;">
+                    {% block breadcrumb %}
+                    {% endblock %}
+                </ol>
+            </div>
+        </nav>
+        {% endblock %}
+        {% block content %}{% endblock %}
 
         <!-- Optional JavaScript -->
+        <script src="{{ url_for('static', filename='scripts/utils.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/password_utils.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/user_utils.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/alerts.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <script type="text/javascript">
-            const alertPopup = document.getElementById('alertPopup');
-            const appendAlert = (message, type) => {
-                type = type == 'error' ? 'danger' : type;
-                const wrapper = document.createElement('div');
-                const icons = {
-                    'danger': `<i class="bi bi-x-circle"></i>`,
-                    'warning': `<i class="bi bi-exclamation-triangle"></i>`,
-                    'info': `<i class="bi bi-info-circle-fill"></i>`,
-                    'success': `<i class="bi bi-check-circle"></i>`
-                }
-
-                wrapper.innerHTML = [
-                    `<div class="alert alert-${type} d-flex align-items-center alert-dismissible" role="alert">`,
-                    `   <div>${icons[type]} ${message}</div>`,
-                    `   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`,
-                    `</div>`
-                ].join('')
-
-                // check if there are old undismissed popups
-                if (alertPopup.children.length != 0) {
-                    alertPopup.innerHTML = '';
-                }
-                
-                alertPopup.parentElement.style.removeProperty('margin-bottom');
-                alertPopup.append(wrapper);
-            }
-            const loadMessages = () => {
-                console.log("{{ get_flashed_messages(with_categories=true) }}")
-                const flash_messages = JSON.parse("{{ get_flashed_messages(with_categories=true) }}".replaceAll('&#39;', '"').replace(/\(/g, "[").replace(/\)/g, "]"));
-
-                for (let flash_message of flash_messages) {
-                    appendAlert(flash_message[1], flash_message[0]);
-                }
-            }
-            loadMessages();
-
-            function checkVerify() {
-                const newPassword = document.getElementById('newPassword');
-                const verifyPassword = document.getElementById('verifyPassword');
-                const invalidNewPassword = document.getElementById('invalidNewPassword');
-                const invalidVerifyPassword = document.getElementById('invalidVerifyPassword');
-
-                // check if the new password is a valid one
-                if (newPassword.value != '') {
-                    const regex = RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[-+_!@#$%^&=*.,?]).+$');
-                    var isValid = regex.test(newPassword.value);
-                    if (!isValid) {
-                        invalidNewPassword.style.setProperty('display', 'block', 'important');
-                        newPassword.style.setProperty('border-color', 'var(--bs-form-invalid-border-color)', 'important');
-                    } else {
-                        invalidNewPassword.style.setProperty('display', 'none', 'important');
-                        newPassword.style.setProperty('border-color', 'var(--bs-border-color)', 'important');
-                    }
-                } else {
-                    newPassword.style.setProperty('border-color', 'var(--bs-border-color)', 'important');
-                    invalidNewPassword.style.setProperty('border-color', 'var(--bs-border-color)', 'important');
-                }
-                
-
-                // now check if verify password isnt empty and assume that the user is inputting their own new password
-                if (verifyPassword.value != '') {
-                    if (newPassword.value == verifyPassword.value) {
-                        newPassword.style.setProperty('border-color', 'var(--bs-form-valid-border-color)', 'important');
-                        verifyPassword.style.setProperty('border-color', 'var(--bs-form-valid-color)', 'important');                            
-                        invalidVerifyPassword.style.setProperty('display', 'none', 'important');
-                    } else {
-                        newPassword.style.setProperty('border-color', 'var(--bs-form-invalid-border-color)', 'important');
-                        verifyPassword.style.setProperty('border-color', 'var(--bs-form-invalid-color)', 'important');                            
-                        invalidVerifyPassword.style.setProperty('display', 'block', 'important');
-                    }
-                } else {
-                    verifyPassword.style.setProperty('border-color', 'var(--bs-border-color)', 'important');
-                }
-            }
-
-            async function fetchUsers() {
-                const users = await fetch("/fetch?users").then((res) => res.json());
-
-                const userDiv = document.querySelector(".users");
-                userDiv.innerHTML = '';
-                const userCounter = document.getElementById('userCounter');
-                userCounter.innerText = 'Users (' + users.length + ')';
-
-                for (let user of users) {
-                    const newUserCard = document.createElement('div');
-                    newUserCard.classList.add('card');
-                    newUserCard.classList.add('d-flex');
-                    newUserCard.classList.add('m-3');
-
-                    const newUserCardBody = document.createElement('div');
-                    newUserCardBody.classList.add('card-body');
-                    newUserCardBody.classList.add('flex-row');
-                    newUserCardBody.classList.add('d-flex');
-                    newUserCardBody.classList.add('align-items-center');
-                    
-                    const userPfp = document.createElement('img');
-                    if (user.pfp[1]){
-                        userPfp.src = "data:image/" + user.pfp[0] + ";base64," + user.pfp[1];
-                    } else {
-                        userPfp.src = "{{ url_for('static', filename='assets/placeholder.jpg') }}"
-                    }
-                    userPfp.style.width = '48px';
-                    userPfp.style.height = '48px';
-                    userPfp.style.setProperty('border-radius', '50%');
-                    userPfp.style.setProperty('object-fit', 'cover');
-                    newUserCardBody.appendChild(userPfp);
-                                     
-                    const userDetails = document.createElement('div');
-                    userDetails.classList.add('flex-column');
-                    userDetails.classList.add('flex-grow-1');
-                    userDetails.classList.add('d-flex');
-                    userDetails.classList.add('ms-3');
-
-                    const userName = document.createElement('h5');
-                    userName.classList.add('card-title');
-                    userName.innerText = user.name + " ";
-
-                    const userRoleBadge = document.createElement('span');
-                    userRoleBadge.classList.add('badge');
-                    switch (user.role) {
-                        case "admin":
-                            userRoleBadge.classList.add('text-bg-primary');
-                            userRoleBadge.innerText = "ADMIN";
-                            break;
-                        case "user":
-                            userRoleBadge.classList.add('text-bg-secondary');
-                            userRoleBadge.innerText = "USER";
-                            break;
-                    }
-                    userName.appendChild(userRoleBadge);
-
-                    const userUsername = document.createElement('p');
-                    userUsername.classList.add('card-text');
-                    userUsername.innerText = "[" + user.id  + "] " + user.username;
-
-                    userDetails.appendChild(userName);
-                    userDetails.appendChild(userUsername);
-
-                    const userEditButton = document.createElement('button');
-                    userEditButton.type = "button";
-                    userEditButton.classList.add('btn');
-                    userEditButton.classList.add('btn-warning');
-                    userEditButton.classList.add('justify-content-md-end');
-                    userEditButton.onclick = function() {
-                        const url = window.location.origin;
-                        window.location.href = url + "/edit/" + user.id;
-                    }
-                    userEditButton.innerHTML = `<i class="bi bi-pencil-square"></i>`;
-
-                    newUserCardBody.appendChild(userDetails);
-                    newUserCardBody.appendChild(userEditButton);
-                    newUserCard.appendChild(newUserCardBody);
-                    userDiv.appendChild(newUserCard);
-                }
-
-                const createNewUserButton = document.createElement('button');
-                createNewUserButton.classList.add('btn');
-                createNewUserButton.classList.add('btn-outline-primary');
-                createNewUserButton.classList.add('m-3');
-                createNewUserButton.classList.add('d-grid');
-                createNewUserButton.classList.add('gap-2');
-                createNewUserButton.classList.add('customButton');
-                createNewUserButton.classList.add('align-content-center');
-                createNewUserButton.innerHTML = `<h1><i class="bi bi-plus-lg"></i></h1>`;
-                createNewUserButton.title = "Register a new user";
-                createNewUserButton.onclick = () => window.location.pathname = "/register";
-                
-
-                userDiv.appendChild(createNewUserButton);
-            }
-            
-            function setTheme(theme) {
-                if (!document.documentElement.getAttribute('data-bs-theme')) {
-                    document.documentElement.setAttribute('data-bs-theme', theme);
-                    document.documentElement.classList = '';
-                    document.documentElement.classList.add(theme + '-bg-img');
-                } else if (document.documentElement.getAttribute('data-bs-theme') != theme) {
-                    document.documentElement.setAttribute('data-bs-theme', theme);
-                    document.documentElement.classList = '';
-                    document.documentElement.classList.add(theme + '-bg-img');
-                }
-
-                if (theme == "dark") {
-                    document.querySelector('#btnSwitch').classList.replace('btn-dark', 'btn-light');
-                    document.querySelector('#btnSwitch').innerHTML = `<i class="bi bi-sun-fill"></i>`;
-                } else {
-                    document.querySelector('#btnSwitch').classList.replace('btn-light', 'btn-dark');
-                    document.querySelector('#btnSwitch').innerHTML = `<i class="bi bi-moon-fill"></i>`;
-                }
-            }
-
-            document.getElementById('btnSwitch').addEventListener('click',()=>{
-                if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-                    setTheme('light');
-                }
-                else {
-                    setTheme('dark');
-                }
-            });
+            loadMessages("{{ get_flashed_messages(with_categories=true) }}");
         </script>
         {% block scripts %}{% endblock %}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>
 

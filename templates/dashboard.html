@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block navbarImage %}
-{% if not user['pfp'][1] %}
-<img src="{{ url_for('static', filename='assets/placeholder.jpg') }}" width="48px" height="48px" style="border-radius: 50%; object-fit: cover;">
-{% else %}
-<img src="data:image/{{ user['pfp'][0] }};base64,{{ user['pfp'][1] }}" width="48px" height="48px" style="border-radius: 50%; object-fit: cover;">
-{% endif %}
+<img src="{{ user['pfp']['image_path'] }}" width="48px" height="48px" style="border-radius: 50%; object-fit: cover;">
 {% endblock %}
 {% block offcanvasNavbarHeader %}
 <span class="offcanvas-title">
-    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}</h5>
+    <h5 id="offcanvasNavbarLabel">{{ user['name'] }}
+        {% if user['role']['id'] == 1 %}
+        <span class="badge text-bg-primary">ADMIN</span>
+        {% endif %}
+    </h5>
     {{ user['username'] }}
 </span>
 {% endblock %}
@@ -18,14 +18,16 @@
         <a class="nav-link active" aria-current="page" href="#">Home</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/profile/{{ user['id'] }}">Profile</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="/preferences">Preferences</a>
     </li>
+    {% if user['role']['id'] == 1 %}
     <li class="nav-item">
-        <a class="nav-link" href="/logs">Audit Logs</a>
+        <a class="nav-link" href="/logs">Audit logs</a>
     </li>
+    {% endif %}
 </ul>
 {% endblock %}
 {% block offcanvasNavbarFooter %}
@@ -36,9 +38,14 @@
 </div>
 {% endblock %}
 
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Home</li>
+{% endblock %}
+
 {% block content %}
-<div class="mt-5 pt-5">    </div>
-<div class="card m-5 col-sm-8 min-vw-50 justify-content-center">
+<h1 class="text-center text-white mx-auto m-3 p-3 shadow bg-body bg-opacity-25 rounded" style="max-width: fit-content;">Welcome back, {{ user['name'] }}</h1>
+{% if user['role']['id'] == 1 %}
+<div class="card m-5 col-sm-8 min-vw-50 justify-content-center mx-auto" style="min-width: fit-content; max-width: max-content;">
     <div class="card-header">
         <h1 class="card-title" id="userCounter">Users (0)</h1>
     </div>
@@ -46,11 +53,16 @@
         users here
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script type="text/javascript">
-    (async() => await fetchUsers())();
     setTheme("{{ user['theme'] }}");
 </script>
+{% if user['role']['id'] == 1 %}
+<script type="text/javascript">
+    (async() => await fetchUsers())();
+</script>
+{% endif %}
 {% endblock %}

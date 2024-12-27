@@ -4,7 +4,7 @@ import os, asyncio
 
 # MySQL Database Class
 
-class MySQLDatabase:
+class Database:
     def __init__(self, flask_app):
         """Database object for Flask web app"""
         self.__config = configparser.RawConfigParser()
@@ -56,5 +56,5 @@ class MySQLDatabase:
                 user = self.__config.get("mysql-config", "MYSQL_USER"),
                 db = self.__config.get("mysql-config", "MYSQL_DB")
             ))
-            print("[i] Database backed up. Next in one minute...")
-            await asyncio.sleep(60)
+            print("[i] Database backed up. Next in 30 minutes...")
+            await asyncio.sleep(360)
