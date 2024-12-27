@@ -1,3 +1,4 @@
+// Async function to fetch and display users
 async function fetchUsers() {
     const users = await fetch("/fetch?users").then((res) => res.json());
     const userDiv = document.querySelector(".users");
@@ -112,6 +113,7 @@ async function fetchUsers() {
     userDiv.appendChild(createNewUserButton);
 }
 
+// Async function to delete a user
 async function deleteUser() {
     console.log("deleteUser invoked.");
     const formElement = document.getElementById("deleteForm");

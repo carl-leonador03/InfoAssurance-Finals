@@ -232,6 +232,7 @@ class MySQLDatabase(Database):
         return tuple(users)
     
     def getPassword(self, user: User, csrf_token: str) -> str:
+        """Fetches the password for user. Requires CSRF token."""
         if csrf_token:
             return self.queryGet("SELECT HEX(passwordHash) AS passwordHash FROM users WHERE id=%s", (user['id'],))['passwordHash']
     
@@ -297,7 +298,7 @@ class MySQLDatabase(Database):
             return False
 
     def updateUserPassword(self, user: User, old_password: bytes, new_password: bytes, csrf_token: str) -> int:
-        """Updates password for user. Requires CSRF Token to ensure it's protected."""
+        """Updates password for user. Requires CSRF Token."""
         if csrf_token:
             current_password = self.queryGet("SELECT HEX(passwordHash) AS passwordHash FROM users WHERE id=%s", (user['id'],))['passwordHash']
 
@@ -316,7 +317,7 @@ class MySQLDatabase(Database):
             return 2
     
     def createUser(self, new_user: User, password: bytes, csrf_token: str) -> int:
-        """Creates a new user in database from User object. Requires CSRF Token for security."""
+        """Creates a new user in database from User object. Requires CSRF Token."""
         if csrf_token:
             existing_users = [
                 user for user in self.queryGetAll("SELECT id, username FROM users")
@@ -344,7 +345,7 @@ class MySQLDatabase(Database):
             return 2
     
     def deleteUser(self, user: User, csrf_token: str) -> int:
-        """Deletes an existing user with User object. Requires CSRF Token for security."""
+        """Deletes an existing user with User object. Requires CSRF Token."""
         if csrf_token:
             self.querySet(
                 "DELETE FROM users WHERE id=%s",

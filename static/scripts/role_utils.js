@@ -1,3 +1,4 @@
+// Async unction to fetch and display roles
 async function fetchRoles() {
     const roles = await fetch("/fetch?roles").then((res) => res.json());
 
@@ -122,6 +123,7 @@ async function fetchRoles() {
     roleDiv.appendChild(createNewRoleButton);
 }
 
+// Async function to fetch permissions
 async function fetchPerms() {
     const perms = await fetch("/fetch?perms").then((res) => res.json());
     const permSelect = document.querySelector("#perm-select");
@@ -135,6 +137,7 @@ async function fetchPerms() {
     }
 }
 
+// Async function to create a role
 async function createRole() {
     const roleForm = document.querySelector("#createRoleForm");
     const data = new URLSearchParams(new FormData(roleForm));
@@ -149,6 +152,7 @@ async function createRole() {
     return status;
 }
 
+// Async function to delete a role
 async function deleteRole() {
     const formElement = document.getElementById("deleteForm");
     const data = new URLSearchParams(new FormData(formElement));
@@ -166,6 +170,7 @@ async function deleteRole() {
     }
 }
 
+// Function to show role delete modal manually (fix to that bug)
 function showDeleteModal(id) {
     console.log("invoked")
 

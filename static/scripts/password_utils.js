@@ -36,6 +36,7 @@ function checkVerify() {
     }
 }
 
+// Function for the Show Password toggle button
 function password_toggle(endpoint) {
     const show_eye = document.getElementById("show_eye");
     const hide_eye = document.getElementById("hide_eye");

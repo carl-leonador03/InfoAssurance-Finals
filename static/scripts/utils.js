@@ -1,3 +1,4 @@
+// Function to set the site's theme (dark or light for now)
 function setTheme(theme) {
     if (!document.documentElement.getAttribute('data-bs-theme')) {
         document.documentElement.setAttribute('data-bs-theme', theme);
@@ -18,6 +19,7 @@ function setTheme(theme) {
     }
 }
 
+// Helper function to limit values to alphabet characters (for role name input)
 function limitInput(e) {
     let t = e.target;
     let badValues = /[^a-zA-Z]+/g;

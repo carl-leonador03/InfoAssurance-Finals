@@ -50,6 +50,7 @@ class Database:
             cursor.close()
     
     async def backupDB(self):
+        """Creates a backup of the current database asynchronously. Set to backup every 30 minutes."""
         while True:
             os.system('mariadb-dump --skip-ssl -h {host} -u {user} {db} > instance/{db}.sql'.format(
                 host = self.__config.get("mysql-config", "MYSQL_HOST"),
@@ -57,4 +58,4 @@ class Database:
                 db = self.__config.get("mysql-config", "MYSQL_DB")
             ))
             print("[i] Database backed up. Next in 30 minutes...")
-            await asyncio.sleep(360)
+            await asyncio.sleep(1800)

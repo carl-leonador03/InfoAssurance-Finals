@@ -1,5 +1,6 @@
 const alertPopup = document.getElementById('alertPopup');
 
+// Creates a new alert
 function appendAlert(message, type) {
     type = type == 'error' ? 'danger' : type;
     const wrapper = document.createElement('div');
@@ -17,7 +18,7 @@ function appendAlert(message, type) {
         `</div>`
     ].join('')
 
-    // check if there are old undismissed popups
+    // check if there are any old undismissed popups
     if (alertPopup.children.length != 0) {
         alertPopup.innerHTML = '';
     }
@@ -26,9 +27,11 @@ function appendAlert(message, type) {
     alertPopup.append(wrapper);
 }
 
+// Little hack to load alerts from flash() function from Flask
 function loadMessages (flashed_messages_str) {
-    console.log(flashed_messages_str);
     var flash_messages;
+
+    // Manually parse the string into an array.
     try {
         flash_messages = JSON.parse(flashed_messages_str.replaceAll('&#39;', '"').replace(/\(/g, "[").replace(/\)/g, "]").replaceAll('&#34;', "'"));
     } catch (SyntaxError) {
