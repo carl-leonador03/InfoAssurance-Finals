@@ -8,7 +8,7 @@ class Database:
     def __init__(self, flask_app):
         """Database object for Flask web app"""
         self.__config = configparser.RawConfigParser()
-        self.__config.read("db.config")
+        self.__config.read("db.ini")
 
         with flask_app.app_context():
             flask_app.config["SECRET_KEY"] = self.__config.get("database-config", "SECRET_KEY")
@@ -52,9 +52,10 @@ class Database:
     async def backupDB(self):
         """Creates a backup of the current database asynchronously. Set to backup every 30 minutes."""
         while True:
-            os.system('mariadb-dump --skip-ssl -h {host} -u {user} {db} > instance/{db}.sql'.format(
+            os.system('mariadb-dump --skip-ssl -h {host} -u {user} -p {password} {db} > instance/{db}.sql'.format(
                 host = self.__config.get("mysql-config", "MYSQL_HOST"),
                 user = self.__config.get("mysql-config", "MYSQL_USER"),
+                password = self.__config.get("mysql-config", "MYSQL_PASSWORD"),
                 db = self.__config.get("mysql-config", "MYSQL_DB")
             ))
             print("[i] Database backed up. Next in 30 minutes...")
