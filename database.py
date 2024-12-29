@@ -52,7 +52,13 @@ class Database:
     async def backupDB(self):
         """Creates a backup of the current database asynchronously. Set to backup every 30 minutes."""
         while True:
-            os.system('mariadb-dump --skip-ssl -h {host} -u {user} -p {password} {db} > instance/{db}.sql'.format(
+            if os.sys.platform == 'win32':
+                exec = "mysqldump"
+            else:
+                exec = "mariadb-dump"
+
+            os.system('{dumpprog} --skip-ssl -h {host} -u {user} -p {password} {db} > instance/{db}.sql'.format(
+                dumpprog = exec,
                 host = self.__config.get("mysql-config", "MYSQL_HOST"),
                 user = self.__config.get("mysql-config", "MYSQL_USER"),
                 password = self.__config.get("mysql-config", "MYSQL_PASSWORD"),

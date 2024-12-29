@@ -92,10 +92,16 @@ class ProfilePicture(dict):
                 image_header = image_data[0]  
 
             # Temporarily store profile picture into a temp folder
-            with open("static/assets/tmp/"+sha256(username.encode()).hexdigest(), 'wb') as pfp:
+            temp = "static/tmp/cydia-forums/"
+
+            # Create the temp folder if it doesn't exist yet
+            if not os.path.isdir(temp):
+                os.makedirs(temp)
+
+            with open(temp+sha256(username.encode()).hexdigest(), 'wb') as pfp:
                 pfp.write(image)
             
-            image_path = "static/assets/tmp/"+sha256(username.encode()).hexdigest()
+            image_path = temp+sha256(username.encode()).hexdigest()
         
         else:
             image_header = self.default['image_header']
@@ -126,7 +132,7 @@ class ProfilePicture(dict):
             else:
                 self['image_header'] = image_data[0]
             
-            with open("static/assets/tmp/" + sha256(self['username'].encode()).hexdigest(), 'wb') as pfp:
+            with open(temp + sha256(self['username'].encode()).hexdigest(), 'wb') as pfp:
                 pfp.write(image_data[1])
             
             self['image_path'] = image_path
