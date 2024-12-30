@@ -1,0 +1,19 @@
+To demonstrate the different users, log in with the following credentials for the following roles included in the schema:
+
+1. System
+    User: root
+    Password: 5ys7m=uS3r@_.
+
+2. Admin
+    User: admin_user1
+    Password: Admin_1234
+
+3. User
+    User: user
+    Password: P@ssw0rd
+
+4. Guest
+    User: guest_user
+    Password: Guest_U5er
+
+Please do note that these passwords are not used in any real accounts. If any exists, it is by coincidence.
